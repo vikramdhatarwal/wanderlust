@@ -4,10 +4,8 @@ const mongoose=require("mongoose");
 const path=require("path");
 const ejs=require("ejs");
 const Listing=require("./models/listing");
-
-app.listen(3000,()=>{
-    console.log("server is running on port 3000");
-});
+const PORT=3000;
+app.use(express.urlencoded({extended:true}));
 
 app.set("view engine","ejs");
 app.set("views",path.join(__dirname,"/views"));
@@ -21,6 +19,9 @@ const MONGO_URL="mongodb://127.0.0.1:27017/wanderlust";
 
 main().then(()=>{
     console.log("Connected to MongoDB");
+    app.listen(PORT,()=>{
+        console.log(`server is running on port ${PORT}`);
+    });
 }).catch((err)=>{
     console.error("Error connecting to MongoDB:", err);
 });
@@ -37,6 +38,24 @@ app.get("/listings",async(req,res)=>{
         res.render("listings/index.ejs",{allListings});
     }catch(err){
         console.error("Error fetching listings:", err);
+        res.status(500).send("Internal Server Error");
+    }
+});
+
+
+//new route to display a form for creating a new listing
+app.get("/listings/new",(req,res)=>{
+    res.render("listings/new.ejs");
+});
+
+//Create route to handle form submission and create a new listing
+app.post("/listings",async(req,res)=>{
+    try{
+        const newListing=new Listing(req.body.listing);
+        await newListing.save();
+        res.redirect("/listings");
+    }catch(err){
+        console.error("Error creating listing:", err);
         res.status(500).send("Internal Server Error");
     }
 });
