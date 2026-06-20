@@ -13,5 +13,10 @@
     <% if (listing.image) { %>
         <img src="<%= listing.image.url %>" alt="<%= listing.title %>" style="max-width: 200px;">
     <% } %>
+
+    <a href="/listings/<%= listing._id %>/edit">Edit</a>
+    <form action="/listings/<%= listing._id %>/delete" method="get" style="display:inline;">
+        <button type="submit">Delete</button>
+    </form>
 </body>
 </html>

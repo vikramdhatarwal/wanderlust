@@ -108,6 +108,36 @@ app.put("/listings/:id",async(req,res)=>{
     }
 });
 
+//confirm delete route to display a confirmation page before deleting a listing
+app.get("/listings/:id/delete",async(req,res)=>{
+    const {id}=req.params;
+    try{
+        const listing=await Listing.findById(id);
+        if(!listing){
+            return res.status(404).send("Listing not found");
+        }
+        res.render("listings/confirmDelete.ejs",{listing});
+    }catch(err){
+        console.error("Error fetching listing:", err);
+        res.status(500).send("Internal Server Error");
+    }
+});
+
+//Delete route to delete an existing listing
+app.delete("/listings/:id",async(req,res)=>{
+    const {id}=req.params;
+    try{
+        const deletedListing=await Listing.findByIdAndDelete(id);
+        if(!deletedListing){
+            return res.status(404).send("Listing not found");
+        }
+        res.redirect("/listings");
+    }catch(err){
+        console.error("Error deleting listing:", err);
+        res.status(500).send("Internal Server Error");
+    }
+});
+
 // app.get("/testlistings",async(req,res)=>{ 
 //     let sampleListing=new Listing({
 //         title:"Beautiful Beach House",
