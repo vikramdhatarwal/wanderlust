@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wander Lust</title>
+</head>
+<body>
+    <h1><%= listing.title %></h1>
+    <p><%= listing.description %></p>
+    <p>Location: <%= listing.location %>, Country: <%= listing.country %></p>
+    <p>Price: &#8377 <%= listing.price.toLocaleString('en-IN') %></p>
+    <% if (listing.image) { %>
+        <img src="<%= listing.image.url %>" alt="<%= listing.title %>" style="max-width: 200px;">
+    <% } %>
+</body>
+</html>

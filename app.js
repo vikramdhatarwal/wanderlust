@@ -42,6 +42,21 @@ app.get("/listings",async(req,res)=>{
 });
 
 
+//Show route to display a single listing by ID
+app.get("/listings/:id",async(req,res)=>{
+    const {id}=req.params;
+    try{
+        const listing=await Listing.findById(id);
+        if(!listing){
+            return res.status(404).send("Listing not found");
+        }
+        res.render("listings/show.ejs",{listing});
+    }catch(err){
+        console.error("Error fetching listing:", err);
+        res.status(500).send("Internal Server Error");
+    }
+});
+
 
 // app.get("/testlistings",async(req,res)=>{ 
 //     let sampleListing=new Listing({
