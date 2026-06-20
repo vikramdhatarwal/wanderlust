@@ -5,9 +5,12 @@ const path=require("path");
 const ejs=require("ejs");
 const Listing=require("./models/listing");
 const PORT=3000;
+const ejsMate=require("ejs-mate");
+app.engine("ejs",ejsMate);
 app.use(express.urlencoded({extended:true}));
 const methodOverride=require("method-override");
 app.use(methodOverride("_method"));
+app.use (express.static(path.join(__dirname,"/public")));
 
 app.set("view engine","ejs");
 app.set("views",path.join(__dirname,"/views"));

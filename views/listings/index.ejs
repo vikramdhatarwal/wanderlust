@@ -1,16 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wander Lust</title>
-</head>
+<% layout('layouts/boilerplate') %>
 <body>
     <h1>All Listings</h1>
 
-    <form method="GET" action="/listings/new">
+    <!-- <form method="GET" action="/listings/new">
         <button>Add New Listing </button>
-    </form>
+    </form> -->
     <ul>
         <% allListings.forEach(listing => { %>
             <li>
@@ -28,4 +22,3 @@
             </li>
         <% }); %>
 </body>
-</html>
