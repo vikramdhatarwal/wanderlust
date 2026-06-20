@@ -1,17 +1,30 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wander Lust</title>
-</head>
-<body>
-    <h1>Confirm Delete</h1>
-    <p>Are you sure you want to delete this listing?</p>
-    <p><strong><%= listing.title %></strong></p>
-    <form action="/listings/<%= listing._id %>?_method=DELETE" method="POST" style="display:inline;">
-        <button type="submit">Delete</button>
-    </form>
-    <a href="/listings/<%= listing._id %>">Cancel</a>
-</body>
-</html>
+<% layout('layouts/boilerplate') -%>
+<section class="listing-delete-shell">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-7 col-xl-6">
+            <div class="listing-delete-card">
+                <div class="listing-delete-icon-wrap">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+
+                <div class="listing-delete-header">
+                    <p class="listing-delete-kicker">Delete listing</p>
+                    <h1>Confirm Delete</h1>
+                    <p class="listing-delete-copy">Are you sure you want to delete this listing?</p>
+                </div>
+
+                <div class="listing-delete-title">
+                    <span>Listing</span>
+                    <strong><%= listing.title %></strong>
+                </div>
+
+                <div class="listing-delete-actions">
+                    <form action="/listings/<%= listing._id %>?_method=DELETE" method="POST" class="listing-delete-form">
+                        <button type="submit" class="btn btn-dark add-btn listing-delete-confirm-btn">Delete Listing</button>
+                    </form>
+                    <a href="/listings/<%= listing._id %>" class="btn btn-outline-dark listing-delete-cancel-btn">Cancel</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
