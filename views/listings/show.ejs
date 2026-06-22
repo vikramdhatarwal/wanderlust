@@ -26,7 +26,13 @@
 
                     <div class="listing-show-price-wrap">
                         <span class="listing-show-price-label">Price per night</span>
-                        <span class="listing-show-price">&#8377 <%= listing.price.toLocaleString('en-IN') %></span>
+                        <span class="listing-show-price">
+                            <% if (listing.price != null) { %>
+                                &#8377; <%= listing.price.toLocaleString('en-IN') %>
+                            <% } else { %>
+                                Price unavailable
+                            <% } %>
+                        </span>
                     </div>
 
                     <div class="listing-show-description">

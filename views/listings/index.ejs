@@ -1,32 +1,35 @@
 <% layout('layouts/boilerplate') %>
 <%# Use the boilerplate layout for head/meta/styles/scripts %>
-<body>
-    <div class="container py-5">
-        <h1 class="mb-4 fw-bold">All Listings</h1>
-        <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 g-4">
+<div class="py-5">
+    <h1 class="mb-4 fw-bold">All Listings</h1>
+    <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 g-4">
         <%# Iterate over allListings and render a card for each listing %>
         <% allListings.forEach(listing => { %>
             <%# Wrap the entire card in an anchor to make the card clickable %>
             <a href="/listings/<%= listing._id %>" class="text-decoration-none">
                 <div class="card col h-100 shadow-sm listing-card">
                     <%# Display listing image when available (keeps layout intact otherwise) %>
-                    <% if (listing.image) { %>
+                    <% if (listing.image && listing.image.url) { %>
                         <img src="<%= listing.image.url %>" alt="Listing Image" class="card-img-top" style="height: 20rem;">
                     <% } %>
                     <div class="card-img-overlay"></div>
                     <div class="card-body">
                         <%# Card details: title, short description, location and price %>
-                        <p class="card-text">
-                            <p class="card-title text-dark"><b><%= listing.title %></b></p>
-                            <p class="card-description text-muted small"><%= listing.description %></p>
-                            <p class="card-location text-muted small">📍 <%= listing.location %>, <%= listing.country %></p>
-                            <p class="card-price "><b>₹<%= listing.price.toLocaleString('en-IN') %> /night</b></p>
+                        <p class="card-title text-dark"><b><%= listing.title %></b></p>
+                        <p class="card-description text-muted small"><%= listing.description %></p>
+                        <p class="card-location text-muted small">&#128205; <%= listing.location %>, <%= listing.country %></p>
+                        <p class="card-price">
+                            <b>
+                                <% if (listing.price != null) { %>
+                                    &#8377;<%= listing.price.toLocaleString('en-IN') %> /night
+                                <% } else { %>
+                                    Price unavailable
+                                <% } %>
+                            </b>
                         </p>
-                        
                     </div>
                 </div>
             </a>
         <% }); %>
     </div>
-    </div>
-</body>
+</div>
