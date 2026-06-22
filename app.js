@@ -6,6 +6,8 @@ const ejs=require("ejs");
 const Listing=require("./models/listing");
 const PORT=3000;
 const ejsMate=require("ejs-mate");
+const wrapAsync=require("./utils/wrapAsync.js");
+const ExpressError=require("./utils/ExpressError.js");
 app.engine("ejs",ejsMate);
 app.use(express.urlencoded({extended:true}));
 const methodOverride=require("method-override");
@@ -37,110 +39,101 @@ async function main(){
 }
 
 //Index route to display all listings
-app.get("/listings",async(req,res)=>{
-    try{
-        const allListings=await Listing.find({});
-        res.render("listings/index.ejs",{allListings});
-    }catch(err){
-        console.error("Error fetching listings:", err);
-        res.status(500).send("Internal Server Error");
-    }
-});
+app.get("/listings",wrapAsync(async(req,res)=>{
+   
+    const allListings=await Listing.find({});
+    res.render("listings/index.ejs",{allListings});
+    
+}));
 
 
 //new route to display a form for creating a new listing
-app.get("/listings/new",(req,res)=>{
+app.get("/listings/new",wrapAsync(async(req,res)=>{
     res.render("listings/new.ejs");
-});
+}));
 
 //Create route to handle form submission and create a new listing
-app.post("/listings",async(req,res)=>{
-    try{
-        const newListing=new Listing(req.body.listing);
-        await newListing.save();
-        res.redirect("/listings");
-    }catch(err){
-        console.error("Error creating listing:", err);
-        res.status(500).send("Internal Server Error");
+app.post("/listings",wrapAsync(async(req,res)=>{
+    if(!req.body || !req.body.listing || !req.body.listing.title || !req.body.listing.description || req.body.listing.price == null || !req.body.listing.location || !req.body.listing.country){
+        throw new ExpressError(400,"Invalid listing data");
     }
-});
+    const newListing=new Listing(req.body.listing);
+    await newListing.save();
+    res.redirect("/listings");
+
+}));
 
 
 //Show route to display a single listing by ID
-app.get("/listings/:id",async(req,res)=>{
+app.get("/listings/:id",wrapAsync(async(req,res)=>{
     const {id}=req.params;
-    try{
-        const listing=await Listing.findById(id);
-        if(!listing){
-            return res.status(404).send("Listing not found");
-        }
-        res.render("listings/show.ejs",{listing});
-    }catch(err){
-        console.error("Error fetching listing:", err);
-        res.status(500).send("Internal Server Error");
+    
+    const listing=await Listing.findById(id);
+    if(!listing){
+        return res.status(404).send("Listing not found");
     }
-});
+    res.render("listings/show.ejs",{listing});
+    
+}));
 
 //Edit route to display a form for editing an existing listing
-app.get("/listings/:id/edit",async(req,res)=>{
+app.get("/listings/:id/edit",wrapAsync(async(req,res)=>{
     const {id}=req.params;
-    try{
-        const listing=await Listing.findById(id);
-        if(!listing){
-            return res.status(404).send("Listing not found");
-        }
-        res.render("listings/edit.ejs",{listing});
-    }catch(err){
-        console.error("Error fetching listing:", err);
-        res.status(500).send("Internal Server Error");
+    
+    const listing=await Listing.findById(id);
+    if(!listing){
+        return res.status(404).send("Listing not found");
     }
-});
+    res.render("listings/edit.ejs",{listing});
+    
+}));
 
 //Update route to handle form submission and update an existing listing
-app.put("/listings/:id",async(req,res)=>{
+app.put("/listings/:id",wrapAsync(async(req,res)=>{
     const {id}=req.params;
-    try{
-        const updatedListing=await Listing.findByIdAndUpdate(id,req.body.listing,{new:true});
-        if(!updatedListing){
-            return res.status(404).send("Listing not found");
-        }
-        res.redirect(`/listings/${updatedListing._id}`);
-    }catch(err){
-        console.error("Error updating listing:", err);
-        res.status(500).send("Internal Server Error");
+  
+    const updatedListing=await Listing.findByIdAndUpdate(id,req.body.listing,{new:true});
+    if(!updatedListing){
+        return res.status(404).send("Listing not found");
     }
-});
+    res.redirect(`/listings/${updatedListing._id}`);
+ 
+}));
 
 //confirm delete route to display a confirmation page before deleting a listing
-app.get("/listings/:id/delete",async(req,res)=>{
+app.get("/listings/:id/delete",wrapAsync(async(req,res)=>{
     const {id}=req.params;
-    try{
-        const listing=await Listing.findById(id);
-        if(!listing){
-            return res.status(404).send("Listing not found");
-        }
-        res.render("listings/confirmDelete.ejs",{listing});
-    }catch(err){
-        console.error("Error fetching listing:", err);
-        res.status(500).send("Internal Server Error");
+
+    const listing=await Listing.findById(id);
+    if(!listing){
+        return res.status(404).send("Listing not found");
     }
-});
+    res.render("listings/confirmDelete.ejs",{listing});
+
+}));
 
 //Delete route to delete an existing listing
-app.delete("/listings/:id",async(req,res)=>{
+app.delete("/listings/:id",wrapAsync(async(req,res)=>{
     const {id}=req.params;
-    try{
-        const deletedListing=await Listing.findByIdAndDelete(id);
-        if(!deletedListing){
-            return res.status(404).send("Listing not found");
-        }
-        res.redirect("/listings");
-    }catch(err){
-        console.error("Error deleting listing:", err);
-        res.status(500).send("Internal Server Error");
+    
+    const deletedListing=await Listing.findByIdAndDelete(id);
+    if(!deletedListing){
+        return res.status(404).send("Listing not found");
     }
+    res.redirect("/listings");
+  
+}));
+
+app.use((req,res,next)=>{
+    next(new ExpressError(404,"Page Not Found!"));
 });
 
+app.use((err,req,res,next)=>{
+    let {statusCode=500,message="Something went wrong!"}=err;
+    
+    
+    res.status(statusCode).send(message);
+});
 // app.get("/testlistings",async(req,res)=>{ 
 //     let sampleListing=new Listing({
 //         title:"Beautiful Beach House",
