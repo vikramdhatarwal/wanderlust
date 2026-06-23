@@ -9,6 +9,7 @@ const ejsMate=require("ejs-mate");
 const wrapAsync=require("./utils/wrapAsync.js");
 const ExpressError=require("./utils/ExpressError.js");
 const { listingSchema } = require("./schema.js");
+const { reviewSchema } = require("./schema.js");
 const Review=require("./models/review.js");
 app.engine("ejs",ejsMate);
 app.use(express.urlencoded({extended:true}));
@@ -40,8 +41,19 @@ async function main(){
 
 }
 
+//server side validation middleware for listing  using Joi schemas
 const validateListing=(req,res,next)=>{
     const { error } = listingSchema.validate(req.body);
+    if (error) {
+        const errMsg=error.details.map((el)=>el.message).join(",");
+        throw new ExpressError(400,errMsg);
+    }
+    next();
+};
+
+//server side validation middleware for review using Joi schemas
+const validateReview=(req,res,next)=>{
+    const { error } = reviewSchema.validate(req.body);
     if (error) {
         const errMsg=error.details.map((el)=>el.message).join(",");
         throw new ExpressError(400,errMsg);
@@ -76,7 +88,7 @@ app.post("/listings",validateListing,wrapAsync(async(req,res)=>{
 app.get("/listings/:id",wrapAsync(async(req,res)=>{
     const {id}=req.params;
     
-    const listing=await Listing.findById(id);
+    const listing=await Listing.findById(id).populate("reviews");
     if(!listing){
         throw new ExpressError(404,"Listing not found");
     }
@@ -133,7 +145,7 @@ app.delete("/listings/:id",wrapAsync(async(req,res)=>{
 }));
 
 //review route to handle form submission and create a new review for a listing
-app.post("/listings/:id/reviews",wrapAsync(async(req,res)=>{
+app.post("/listings/:id/reviews", validateReview, wrapAsync(async(req,res)=>{
     const {id}=req.params;
     const {rating, comment} = req.body.review;
 

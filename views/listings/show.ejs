@@ -51,17 +51,35 @@
 
                     <div class="col-12 col-lg-10 col-xl-9 mb-3">
                         <h4> leave a review</h4>
-                        <form action="/listings/<%= listing._id %>/reviews" method="post">
+                        <form action="/listings/<%= listing._id %>/reviews" method="post" novalidate class="needs-validation">
                             <div class="mb-3 mt-3">
                                 <label for="rating" class="form-label">Rating</label>
                                 <input type="range" min="1" max="5"  id="rating" class="form-range" name="review[rating]" required>
                             </div>
                             <div class="mb-3 mt-3">
                                 <label for="comment" class="form-label">Comment</label>
-                                <textarea class="form-control" id="comment" name="review[comment]" rows="3" required></textarea>
+                                <textarea class="form-control" id="comment" name="review[comment]" rows="3" required ></textarea>
+                                <div class="invalid-feedback">
+                                    Please provide a comment.
+                                </div>
                             </div>
                             <button type="submit" class="btn btn-outline-dark">Submit Review</button>
                         </form>
+                        <hr>
+
+                        <h4>All Reviews</h4>
+                        <% if (listing.reviews.length === 0) { %>
+                            <p>No reviews yet.</p>
+                        <% } else { %>
+                            <% listing.reviews.forEach(review => { %>
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Rating: <%= review.rating %> / 5</h5>
+                                        <p class="card-text"><%= review.comment %></p>
+                                    </div>
+                                </div>
+                            <% }); %>
+                        <% } %>
                     </div>
                 </div>
             </div>
