@@ -7,8 +7,8 @@ const ejs=require("ejs");
 const PORT=3000;
 const ejsMate=require("ejs-mate");
 
-
-
+const session=require("express-session");
+const Flash=require("connect-flash");
 
 const listingRoutes=require("./routes/listing.js");
 const reviewRoutes=require("./routes/review.js");
@@ -20,6 +20,32 @@ app.use (express.static(path.join(__dirname,"/public")));
 
 app.set("view engine","ejs");
 app.set("views",path.join(__dirname,"/views"));
+
+const sessionOptions={
+    secret:"thisshouldbeabettersecret!",
+    resave:false,
+    saveUninitialized:true,
+    cookie:{
+        httpOnly:true,
+        expires:Date.now()+1000*60*60*24*7,
+        maxAge:1000*60*60*24*7
+    }
+};
+
+
+
+
+app.use(session(sessionOptions));
+app.use(Flash());
+
+
+app.use((req,res,next)=>{
+    res.locals.success=req.flash("success");
+    res.locals.error=req.flash("error");
+    next();
+});
+
+
 app.get("/",(req,res)=>{
     res.render("home.ejs");
 });
@@ -44,7 +70,6 @@ async function main(){
 
 
 
-//server side validation middleware for review using Joi schemas
 
 
 app.use("/listings",listingRoutes);
