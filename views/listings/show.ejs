@@ -36,11 +36,13 @@
                         </span>
                     </div>
 
+                    <% const isListingOwner = currentUser && listing.owner && currentUser._id.equals(listing.owner._id || listing.owner); %>
+
                     <div class="listing-show-description">
                         <h2>Description</h2>
                         <p><%= listing.description %></p>
                     </div>
-                        <% if(currentUser && currentUser._id.equals(listing.owner)) { %>
+                        <% if(isListingOwner) { %>
                             <div class="listing-show-actions">
                                 <a href="/listings/<%= listing._id %>/edit" class="btn btn-outline-dark listing-action-btn">Edit Listing</a>
                                 <form action="/listings/<%= listing._id %>/delete" method="get" class="listing-delete-form">
@@ -90,16 +92,28 @@
                         <% } else { %>
                             <div class="listing-review-grid">
                                 <% listing.reviews.forEach(review => { %>
+                                    <% 
+                                        const author = review.author;
+                                        const authorId = author && (author._id || author);
+                                        const authorName = author && author.username ? author.username : "Deleted user";
+                                        const authorInitials = authorName
+                                            .split(" ")
+                                            .map(name => name[0])
+                                            .join("")
+                                            .slice(0, 2)
+                                            .toUpperCase();
+                                        const isReviewOwner = currentUser && authorId && currentUser._id.equals(authorId);
+                                    %>
                                     <div class="listing-review-card">
                                         <div class="listing-review-card-head">
-                                            <div class="listing-review-avatar">JD</div>
+                                            <div class="listing-review-avatar"><%= authorInitials %></div>
                                             <div>
-                                                <h3>Jan Doe</h3>
+                                                <h3><%= authorName %></h3>
                                                 <p><i class="fa-solid fa-star"></i> <%= review.rating %> / 5</p>
                                             </div>
                                         </div>
                                         <p class="listing-review-comment"><%= review.comment %></p>
-                                        <% if(currentUser && review.author && currentUser._id.equals(review.author)) { %>
+                                        <% if(isReviewOwner) { %>
                                             <form action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE" method="post" class="listing-review-delete-form">
                                                 <button type="submit" class="btn btn-sm btn-outline-dark listing-review-delete-btn">Delete</button>
                                             </form>

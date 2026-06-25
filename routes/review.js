@@ -20,18 +20,16 @@ const validateReview=(req,res,next)=>{
 router.post("/", isLoggedIn, validateReview, wrapAsync(async(req,res)=>{
     const {id}=req.params;
     const {rating, comment} = req.body.review;
-
     const listing = await Listing.findById(id);
     if (!listing) {
         throw new ExpressError(404, "Listing not found");
     }
-
     const newReview = new Review({
         rating,
         comment,
         author: req.user._id
     });
-
+    newReview.author = req.user._id;
     listing.reviews.push(newReview);
     await newReview.save();
     await listing.save();
