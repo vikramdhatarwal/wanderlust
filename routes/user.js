@@ -13,8 +13,11 @@ router.post("/register", wrapAsync(async (req, res) => {
         const { email, username, password } = req.body;
         const user = new User({ email, username });
         const registeredUser = await User.register(user, password);
-        req.flash("success", "Welcome to WonderLust!");
-        res.redirect("/login");
+        req.login(registeredUser, (err) => {
+            if (err) return next(err);
+            req.flash("success", "Welcome to WonderLust!");
+            res.redirect("/listings");
+        });
     } catch (error) {
         req.flash("error", "Already registered with this email or username. Please try again.");
         res.redirect("/register");
@@ -34,6 +37,14 @@ router.post("/login",
 async(req, res) => {
     req.flash("success", "Welcome back!");
     res.redirect("/listings");
+});
+
+router.get("/logout", (req, res,next) => {
+    req.logout(function(err) {
+        if (err) { return next(err); }
+        req.flash("success", "You have been logged out!");
+        res.redirect("/login");
+    });
 });
 
 

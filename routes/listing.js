@@ -4,7 +4,7 @@ const wrapAsync=require("../utils/wrapAsync.js");
 const { listingSchema } = require("../schema.js");
 const ExpressError=require("../utils/ExpressError.js");
 const Listing=require("../models/listing");
-
+const { isLoggedIn } = require("../middleware.js");
 
 //server side validation middleware for listing  using Joi schemas
 const validateListing=(req,res,next)=>{
@@ -26,12 +26,12 @@ router.get("/",wrapAsync(async(req,res)=>{
 
 
 //new route to display a form for creating a new listing
-router.get("/new",wrapAsync(async(req,res)=>{
+router.get("/new",isLoggedIn,wrapAsync(async(req,res)=>{
     res.render("listings/new.ejs");
 }));
 
 //Create route to handle form submission and create a new listing
-router.post("/",validateListing,wrapAsync(async(req,res)=>{
+router.post("/",validateListing,isLoggedIn,wrapAsync(async(req,res)=>{
     const newListing=new Listing(req.body.listing);
     await newListing.save();
     req.flash("success","Successfully created a new listing!");
@@ -55,7 +55,7 @@ router.get("/:id",wrapAsync(async(req,res)=>{
 }));
 
 //Edit route to display a form for editing an existing listing
-router.get("/:id/edit",wrapAsync(async(req,res)=>{
+router.get("/:id/edit",isLoggedIn,wrapAsync(async(req,res)=>{
     const {id}=req.params;
     
     const listing=await Listing.findById(id);
@@ -69,7 +69,7 @@ router.get("/:id/edit",wrapAsync(async(req,res)=>{
 }));
 
 //Update route to handle form submission and update an existing listing
-router.put("/:id",validateListing,wrapAsync(async(req,res)=>{
+router.put("/:id",validateListing,isLoggedIn,wrapAsync(async(req,res)=>{
     const {id}=req.params;
   
     const updatedListing=await Listing.findByIdAndUpdate(id,req.body.listing,{new:true,runValidators:true});
