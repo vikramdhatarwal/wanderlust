@@ -1,25 +1,27 @@
 const express = require("express");
 const router = express.Router({ mergeParams: true });
-const User=require("../models/user.js");
 const wrapAsync=require("../utils/wrapAsync.js");
 const passport=require("passport");
 const {saveRedirectUrl}=require("../middleware.js");
 
 const userController=require("../controllers/users.js");
-router.get("/register", userController.renderSignUpForm);
+
+router.route("/register")
+    .get(userController.renderSignUpForm)
+    .post(wrapAsync(userController.signUp));
 
 
-router.post("/register", wrapAsync(userController.signUp));
 
-router.get("/login", userController.renderLoginForm);
+router.route("/login")
+    .get(userController.renderLoginForm)
+    .post(saveRedirectUrl,
+        passport.authenticate("local", {
+        failureFlash: true,
+        failureRedirect: "/login"  
+        }),
+        userController.login
+    );
 
-
-router.post("/login",saveRedirectUrl,
-    passport.authenticate("local", {
-    failureFlash: true,
-    failureRedirect: "/login"  
-}),
-userController.login);
 
 router.get("/logout", userController.logout);
 
