@@ -1,5 +1,6 @@
 const Joi = require('joi');
 
+// Server-side validation mirrors the required listing form fields.
 module.exports.listingSchema = Joi.object({
     listing: Joi.object({
         title: Joi.string().required(),
@@ -14,6 +15,7 @@ module.exports.listingSchema = Joi.object({
     }).required()
 }).required();
 
+// Review validation keeps ratings inside the star input range.
 module.exports.reviewSchema = Joi.object({
     review: Joi.object({
         rating: Joi.number().min(1).max(5).required(),

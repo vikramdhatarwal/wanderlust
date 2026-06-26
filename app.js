@@ -21,6 +21,7 @@ const LocalStrategy=require("passport-local");
 const User=require("./models/user.js");
 
 
+// App-level middleware and view engine setup.
 app.engine("ejs",ejsMate);
 app.use(express.urlencoded({extended:true}));
 app.use(methodOverride("_method"));
@@ -40,16 +41,19 @@ const sessionOptions={
     }
 };
 
+// Sessions power login persistence and flash messages.
 app.use(session(sessionOptions));
 app.use(Flash());
 
 
+// Passport handles local username/password authentication.
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
+// Make flash messages and auth state available to every EJS template.
 app.use((req,res,next)=>{
     res.locals.success=req.flash("success");
     res.locals.error=req.flash("error");
@@ -67,6 +71,7 @@ app.get("/",(req,res)=>{
 const MONGO_URL="mongodb://127.0.0.1:27017/wanderlust";
 
 
+// Start the server only after MongoDB is reachable.
 main().then(()=>{
     console.log("Connected to MongoDB");
     app.listen(PORT,()=>{
@@ -85,11 +90,13 @@ async function main(){
 
 
 
+// Feature route groups.
 app.use("/listings",listingRoutes);
 app.use("/listings/:id/reviews",reviewRoutes);
 app.use("/",userRoutes);
 
 
+// 404 and centralized error rendering.
 app.use((req,res,next)=>{
     next(new ExpressError(404,"Page Not Found!"));
 });

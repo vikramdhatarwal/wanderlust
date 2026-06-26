@@ -6,6 +6,7 @@ const ExpressError=require("./utils/ExpressError.js");
 
 module.exports.isLoggedIn=(req,res,next)=>{
     if(!req.isAuthenticated()){
+        // Remember the protected page so users can return after login.
         req.session.redirectUrl=req.originalUrl;
         req.flash("error","You must be logged in to do that");
         return res.redirect("/login");
@@ -52,6 +53,7 @@ module.exports.isReviewAuthor=async(req,res,next)=>{
 };
 
 module.exports.validateListing=(req,res,next)=>{
+    // Joi validates the request body before controllers create/update records.
     const { error } = listingSchema.validate(req.body);
     if (error) {
         const errMsg=error.details.map((el)=>el.message).join(",");

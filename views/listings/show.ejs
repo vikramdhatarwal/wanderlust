@@ -130,9 +130,43 @@
                                 <% }); %>
                             </div>
                         <% } %>
+                        
+                    </div>
+                    <hr>
+                    <%# Map section: geocodes the listing address and routes from the visitor's browser location. %>
+                    <div class="listing-map-section">
+                        <div class="listing-map-container">
+                            <div class="listing-map-heading">
+                                <div>
+                                    <p class="listing-show-kicker">Location</p>
+                                    <h3>Where you'll be</h3>
+                                </div>
+                                <span class="listing-map-address"><i class="fa-solid fa-location-dot"></i> <%= listing.location %>, <%= listing.country %></span>
+                            </div>
+                            <div class="listing-route-controls">
+                                <button type="button" id="goToListingBtn" class="btn btn-dark add-btn" disabled>
+                                    <i class="fa-solid fa-route"></i> Go
+                                </button>
+                                <span id="routeStatus" class="text-muted fw-semibold">Finding destination...</span>
+                            </div>
+                            <div id="map"></div>
+                            <p id="mapFallback" class="text-muted fw-semibold mt-2 d-none"></p>
+                            
+                        </div>  
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
+
+<script src="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.umd.min.js"></script>
+<script>
+    // Safely expose only the data the browser-side map needs.
+    window.listingMapData = {
+        mapToken: <%- JSON.stringify(mapToken || "").replace(/</g, "\\u003c") %>,
+        listingTitle: <%- JSON.stringify(listing.title).replace(/</g, "\\u003c") %>,
+        listingAddress: <%- JSON.stringify(`${listing.location}, ${listing.country}`).replace(/</g, "\\u003c") %>
+    };
+</script>
+<script src="/js/map.js"></script>

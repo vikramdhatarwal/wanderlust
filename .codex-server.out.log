@@ -1,0 +1,4 @@
+◇ injected env (4) from .env // tip: ⌘ custom filepath { path: '/custom/path/.env' }
+◇ injected env (0) from .env // tip: ⌘ enable debugging { debug: true }
+Connected to MongoDB
+server is running on port 3000

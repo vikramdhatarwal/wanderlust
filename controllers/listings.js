@@ -15,6 +15,8 @@ module.exports.renderNewForm=async(req,res)=>{
 module.exports.createListing=async(req,res)=>{
     const newListing=new Listing(req.body.listing);
     newListing.owner = req.user._id;
+
+    // Keep uploaded Cloudinary metadata together on the listing document.
     if (req.file) {
         newListing.image = {
             url: req.file.path,
@@ -31,13 +33,18 @@ module.exports.createListing=async(req,res)=>{
 module.exports.showListing=async(req,res)=>{
     const {id}=req.params;
     
+    // Populate ownership data so the view can decide which actions to show.
     const listing=await Listing.findById(id).populate({ path: "reviews", populate: { path: "author" } }).populate("owner");
     if(!listing){
         req.flash("error","Listing not found");
         return res.redirect("/listings");
         // throw new ExpressError(404,"Listing not found");
     }
-    res.render("listings/show.ejs",{listing});
+    res.render("listings/show.ejs",{
+        listing,
+        // Support both env names so existing local .env files keep working.
+        mapToken: process.env.MAP_TOKEN || process.env.MAP_API_KEY || ""
+    });
     
 }
 
@@ -63,6 +70,8 @@ module.exports.updateListing=async(req, res) => {
         req.body.listing,
         { new: true, runValidators: true }
     );
+
+    // Only replace the image when a new file was selected in the edit form.
     if (req.file) {
         updatedListing.image = {
             url: req.file.path,

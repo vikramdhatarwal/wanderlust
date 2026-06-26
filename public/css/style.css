@@ -4,6 +4,10 @@ body{
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    background:
+        radial-gradient(circle at top left, rgba(254, 66, 77, 0.08), transparent 28rem),
+        linear-gradient(180deg, #fffdfd 0%, #f8fafb 100%);
+    color: #222222;
 }
 
 .container{
@@ -15,7 +19,10 @@ body{
 /* ------- Navigation bar ------- */
 .navbar{
     height: 5rem;
-    background-color: white;
+    background-color: rgba(255, 255, 255, 0.94) !important;
+    border-bottom: 1px solid rgba(34, 34, 34, 0.08) !important;
+    box-shadow: 0 8px 24px rgba(34, 34, 34, 0.05);
+    backdrop-filter: blur(12px);
 }
 
 @media (max-width: 767.98px){
@@ -53,6 +60,13 @@ body{
     color: #222222 !important;
     font-size: 1.2rem;
     margin-right: 1rem;
+    font-weight: 600;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.nav-link:hover{
+    color: #fe424d !important;
+    transform: translateY(-1px);
 }
 
 @media (max-width: 767.98px){
@@ -92,6 +106,12 @@ body{
 .f-info-socials i{
     margin-right: 2rem;
     font-size: 1.2rem;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.f-info-socials i:hover{
+    color: #fe424d;
+    transform: translateY(-2px);
 }
 
 .f-info{
@@ -99,10 +119,12 @@ body{
     text-align: center;
     height : 8rem;
     display: flex;
-    background-color: #ebebeb;
+    background: #ffffff;
+    border-top: 1px solid rgba(34, 34, 34, 0.08);
     flex-wrap: wrap;
     justify-content: center;
     align-items: space-evenly;
+    box-shadow: 0 -10px 28px rgba(34, 34, 34, 0.04);
 }
 
 
@@ -111,6 +133,7 @@ body{
     /* Remove default border from bootstrap cards and add spacing */
     border: none !important;
     margin-bottom: 2rem;
+    background-color: transparent !important;
 }
 
 .card-img-top{
@@ -144,6 +167,9 @@ body{
 .listing-card{
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     border-radius: 1rem;
+    padding: 0.35rem;
+    background: #ffffff !important;
+    border: 1px solid rgba(34, 34, 34, 0.08) !important;
 }
 
 .listing-card:hover{
@@ -177,6 +203,13 @@ body{
     background-color: #fe424d !important;
     border: none !important;
     color: white !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.add-btn:hover{
+    filter: brightness(0.98);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px rgba(254, 66, 77, 0.25);
 }
 
 /* ------- New listing form ------- */
@@ -589,6 +622,91 @@ body{
     font-weight: 650;
 }
 
+/* ------- Listing map ------- */
+.listing-map-section{
+    margin-top: 1.75rem;
+}
+
+.listing-map-container{
+    padding: 1.25rem;
+    border: 1px solid rgba(34, 34, 34, 0.1);
+    border-radius: 1.25rem;
+    background: linear-gradient(180deg, #ffffff 0%, #fbfcfd 100%);
+    box-shadow: 0 12px 30px rgba(34, 34, 34, 0.06);
+}
+
+.listing-map-heading{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.listing-map-heading h3{
+    margin: 0;
+    font-size: 1.35rem;
+    font-weight: 750;
+}
+
+.listing-map-address{
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    max-width: 20rem;
+    color: #555b62;
+    font-weight: 650;
+    line-height: 1.4;
+    text-align: right;
+}
+
+.listing-map-address i{
+    color: #fe424d;
+}
+
+.listing-route-controls{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.85rem;
+}
+
+.listing-route-controls .btn{
+    min-width: 6rem;
+    border-radius: 999px !important;
+    font-weight: 700;
+}
+
+#map{
+    width: 100%;
+    height: 22rem;
+    overflow: hidden;
+    border: 1px solid rgba(34, 34, 34, 0.08);
+    border-radius: 1rem;
+    background: #eef2f3;
+}
+
+.kitten-map-marker{
+    width: 3rem;
+    height: 3rem;
+    display: grid;
+    place-items: center;
+    border: 3px solid #ffffff;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ffe1e4, #fff8d8);
+    box-shadow: 0 10px 22px rgba(34, 34, 34, 0.22);
+    cursor: pointer;
+    font-size: 1.65rem;
+    line-height: 1;
+    transform-origin: center bottom;
+    transition: transform 0.2s ease;
+}
+
+.kitten-map-marker:hover{
+    transform: translateY(-3px) scale(1.05);
+}
+
 @media (max-width: 767.98px){
     .listing-show-content{
         padding: 1.25rem;
@@ -625,6 +743,23 @@ body{
 
     .listing-empty-reviews{
         align-items: flex-start;
+    }
+
+    .listing-map-container{
+        padding: 1rem;
+    }
+
+    .listing-map-heading{
+        flex-direction: column;
+    }
+
+    .listing-map-address{
+        max-width: 100%;
+        text-align: left;
+    }
+
+    #map{
+        height: 18rem;
     }
 }
 

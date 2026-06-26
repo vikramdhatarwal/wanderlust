@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const Review = require('./review.js');
 
+// Fallback image keeps old/seeded listings from rendering broken image boxes.
 const placeholderImageUrl = "https://www.monstertreeservice.com/cms/thumbnails/24/1080x540/images/articles/GettyImages-476116580.jpg";
 
 const listingSchema = new Schema({ 
@@ -48,6 +49,7 @@ const listingSchema = new Schema({
 });
 
 
+// Deleting a listing should also clean up its review documents.
 listingSchema.post('findOneAndDelete', async function(doc) {
     if (doc) {
         await Review.deleteMany({
