@@ -166,7 +166,8 @@
     window.listingMapData = {
         mapToken: <%- JSON.stringify(mapToken || "").replace(/</g, "\\u003c") %>,
         listingTitle: <%- JSON.stringify(listing.title).replace(/</g, "\\u003c") %>,
-        listingAddress: <%- JSON.stringify(`${listing.location}, ${listing.country}`).replace(/</g, "\\u003c") %>
+        listingAddress: <%- JSON.stringify(`${listing.location}, ${listing.country}`).replace(/</g, "\\u003c") %>,
+        listingCoordinates: <%- JSON.stringify(listing.geometry && listing.geometry.coordinates ? listing.geometry.coordinates : null).replace(/</g, "\\u003c") %>
     };
 </script>
 <script src="/js/map.js"></script>

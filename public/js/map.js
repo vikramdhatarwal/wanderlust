@@ -20,6 +20,11 @@
     let userMarker = null;
 
     const hasValidAddress = Boolean(mapData.listingAddress && mapData.listingAddress.trim());
+    const hasValidCoordinates = (coordinates) => {
+        return Array.isArray(coordinates)
+            && coordinates.length === 2
+            && coordinates.every((coordinate) => Number.isFinite(coordinate));
+    };
 
     const showMapFallback = (message) => {
         if (!mapFallback) {
@@ -82,6 +87,30 @@
         }
 
         return [startCoordinates, ...routeCoordinates];
+    };
+
+    const addDestinationMarker = (coordinates) => {
+        destinationCoordinates = coordinates;
+        enableRouteButtonIfReady();
+        setRouteStatus("Press Go to route from your location");
+        map.flyTo({ center: coordinates, zoom: 14 });
+
+        const popupContent = document.createElement("div");
+        const popupTitle = document.createElement("strong");
+        const popupAddress = document.createElement("p");
+
+        popupTitle.textContent = mapData.listingTitle;
+        popupAddress.textContent = mapData.listingAddress;
+        popupAddress.className = "mb-0";
+        popupContent.append(popupTitle, popupAddress);
+
+        new maptilersdk.Marker({
+            element: createKittenMarkerElement(),
+            anchor: "bottom"
+        })
+            .setLngLat(coordinates)
+            .setPopup(new maptilersdk.Popup({ offset: 24 }).setDOMContent(popupContent))
+            .addTo(map);
     };
 
     const drawRoute = (startCoordinates, routeCoordinates) => {
@@ -235,6 +264,11 @@
         enableRouteButtonIfReady();
     });
 
+    if (hasValidCoordinates(mapData.listingCoordinates)) {
+        addDestinationMarker(mapData.listingCoordinates);
+        return;
+    }
+
     // Convert the listing's written address into coordinates before routing.
     const geocodingParams = new URLSearchParams({
         key: mapData.mapToken,
@@ -258,27 +292,7 @@
                 return;
             }
 
-            destinationCoordinates = coordinates;
-            enableRouteButtonIfReady();
-            setRouteStatus("Press Go to route from your location");
-            map.flyTo({ center: coordinates, zoom: 12 });
-
-            const popupContent = document.createElement("div");
-            const popupTitle = document.createElement("strong");
-            const popupAddress = document.createElement("p");
-
-            popupTitle.textContent = mapData.listingTitle;
-            popupAddress.textContent = mapData.listingAddress;
-            popupAddress.className = "mb-0";
-            popupContent.append(popupTitle, popupAddress);
-
-            new maptilersdk.Marker({
-                element: createKittenMarkerElement(),
-                anchor: "bottom"
-            })
-                .setLngLat(coordinates)
-                .setPopup(new maptilersdk.Popup({ offset: 24 }).setDOMContent(popupContent))
-                .addTo(map);
+            addDestinationMarker(coordinates);
         })
         .catch(() => {
             showMapFallback("Could not load the map location for this listing.");

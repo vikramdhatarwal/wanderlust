@@ -1,38 +1,110 @@
 <% layout('layouts/boilerplate') %>
 
-
-
-<%# Use the boilerplate layout for head/meta/styles/scripts %>
+<%# Use the boilerplate layout for head/meta/styles/scripts. %>
 <div class="py-5">
-    <h1 class="mb-4 fw-bold">All Listings</h1>
-    <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 g-4">
-        <%# Iterate over allListings and render a card for each listing %>
-        <% allListings.forEach(listing => { %>
-            <%# Wrap the entire card in an anchor to make the card clickable %>
-            <a href="/listings/<%= listing._id %>" class="text-decoration-none">
-                <div class="card col h-100 shadow-sm listing-card">
-                    <%# Display listing image when available (keeps layout intact otherwise) %>
-                    <% if (listing.image && listing.image.url) { %>
-                        <img src="<%= listing.image.url %>" alt="Listing Image" class="card-img-top" style="height: 20rem;">
-                    <% } %>
-                    <div class="card-img-overlay"></div>
-                    <div class="card-body">
-                        <%# Card details: title, short description, location and price %>
-                        <p class="card-title text-dark"><b><%= listing.title %></b></p>
-                        <p class="card-description text-muted small"><%= listing.description %></p>
-                        <p class="card-location text-muted small">&#128205; <%= listing.location %>, <%= listing.country %></p>
-                        <p class="card-price">
-                            <b>
-                                <% if (listing.price != null) { %>
-                                    &#8377;<%= listing.price.toLocaleString('en-IN') %> /night
-                                <% } else { %>
-                                    Price unavailable
-                                <% } %>
-                            </b>
-                        </p>
-                    </div>
-                </div>
+    <%
+        const filters = [
+            { label: "Trending", icon: "fa-solid fa-fire" },
+            { label: "Rooms", icon: "fa-solid fa-bed" },
+            { label: "Mountains", icon: "fa-solid fa-mountain-city" },
+            { label: "Castles", icon: "fa-brands fa-fort-awesome" },
+            { label: "Pools", icon: "fa-solid fa-person-swimming" },
+            { label: "Nature", icon: "fa-solid fa-tree" },
+            { label: "Farms", icon: "fa-solid fa-cow" },
+            { label: "Igloos", icon: "fa-solid fa-igloo" },
+            { label: "Arctic", icon: "fa-solid fa-snowflake" }
+        ];
+    %>
+
+    <div class="listing-toolbar">
+        <div>
+            <p class="listing-form-kicker">Explore stays</p>
+            
+            <% if (searchQuery || selectedCategory) { %>
+                <p class="listing-results-copy">
+                    Showing <%= allListings.length %> result<%= allListings.length === 1 ? "" : "s" %>
+                    <% if (searchQuery) { %> for "<%= searchQuery %>"<% } %>
+                    <% if (selectedCategory) { %> in <%= selectedCategory %><% } %>
+                </p>
+            <% } %>
+        </div>
+        <% if (searchQuery || selectedCategory) { %>
+            <a href="/listings" class="btn btn-outline-dark listing-clear-filter-btn">
+                <i class="fa-solid fa-xmark"></i> Clear
+            </a>
+        <% } %>
+    </div>
+
+    <div id="filters">
+        <% filters.forEach(filter => { %>
+            <% const isActiveFilter = selectedCategory && selectedCategory.toLowerCase() === filter.label.toLowerCase(); %>
+            <a
+                class="filter <%= isActiveFilter ? 'active' : '' %>"
+                href="/listings?category=<%= encodeURIComponent(filter.label) %><%= searchQuery ? `&q=${encodeURIComponent(searchQuery)}` : '' %>"
+                aria-label="Show <%= filter.label %> listings"
+            >
+                <div><i class="<%= filter.icon %>"></i></div>
+                <p><%= filter.label %></p>
             </a>
         <% }); %>
+
+        <div class="tax-switch">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="switchCheckDefault">
+                <label class="form-check-label" for="switchCheckDefault">Display total after taxes</label>
+            </div>
+        </div>
     </div>
+
+    <% if (allListings.length === 0) { %>
+        <div class="listing-empty-results">
+            <i class="fa-regular fa-face-smile"></i>
+            <h2>No listings found</h2>
+            <p>Try another destination, country, or category.</p>
+            <a href="/listings" class="btn btn-dark add-btn">View all listings</a>
+        </div>
+    <% } else { %>
+        <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 g-4 mt-3">
+            <%# Iterate over allListings and render a card for each listing. %>
+            <% allListings.forEach(listing => { %>
+                <%# Wrap the entire card in an anchor to make the card clickable. %>
+                <a href="/listings/<%= listing._id %>" class="text-decoration-none">
+                    <div class="card col h-100 shadow-sm listing-card">
+                        <%# Display listing image when available. %>
+                        <% if (listing.image && listing.image.url) { %>
+                            <img src="<%= listing.image.url %>" alt="<%= listing.title %>" class="card-img-top listing-index-image">
+                        <% } %>
+                        <div class="card-img-overlay"></div>
+                        <div class="card-body">
+                            <%# Card details: title, short description, location and price. %>
+                            <p class="card-title text-dark"><b><%= listing.title %></b></p>
+                            <p class="card-description text-muted small"><%= listing.description %></p>
+                            <p class="card-location text-muted small">&#128205; <%= listing.location %>, <%= listing.country %></p>
+                            <p class="card-price">
+                                <b>
+                                    <% if (listing.price != null) { %>
+                                        &#8377;<%= listing.price.toLocaleString('en-IN') %> /night <i class="tax-info">&nbsp; +18% GST</i>
+                                    <% } else { %>
+                                        Price unavailable
+                                    <% } %>
+                                </b>
+                            </p>
+                        </div>
+                    </div>
+                </a>
+            <% }); %>
+        </div>
+    <% } %>
 </div>
+
+<script>
+    const TaxSwitch = document.getElementById("switchCheckDefault");
+
+    TaxSwitch?.addEventListener("click", function() {
+        const taxInfo = document.getElementsByClassName("tax-info");
+
+        for (let i = 0; i < taxInfo.length; i++) {
+            taxInfo[i].style.display = TaxSwitch.checked ? "inline" : "none";
+        }
+    });
+</script>

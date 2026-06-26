@@ -1,5 +1,7 @@
 const Joi = require('joi');
 
+const listingCategories = ['Arctic', 'Pools', 'Farms', 'Rooms', 'Mountains', 'Igloos', 'Nature', 'Castles', 'Trending', 'Other'];
+
 // Server-side validation mirrors the required listing form fields.
 module.exports.listingSchema = Joi.object({
     listing: Joi.object({
@@ -10,6 +12,7 @@ module.exports.listingSchema = Joi.object({
             url: Joi.string().allow('', null),
             filename: Joi.string().allow('', null)
         }),
+        category: Joi.string().valid(...listingCategories).required(),
         location: Joi.string().required(),
         country: Joi.string().required()
     }).required()

@@ -29,6 +29,12 @@ const listingSchema = new Schema({
         type: Number,
         required: true
     },
+    category: {
+        type: String,
+        required: true,
+        default: 'Other',
+        enum: ['Arctic', 'Pools', 'Farms', 'Rooms', 'Mountains', 'Igloos', 'Nature', 'Castles', 'Trending', 'Other'],
+    },
     location: {
         type: String,
         required: true
@@ -36,6 +42,17 @@ const listingSchema = new Schema({
     country: {
         type: String,
         required: true
+    },
+    geometry: {
+        type: {
+            type: String,
+            enum: ['Point'],
+            default: 'Point'
+        },
+        coordinates: {
+            type: [Number],
+            default: undefined
+        }
     },
     reviews: [{
         type: Schema.Types.ObjectId,

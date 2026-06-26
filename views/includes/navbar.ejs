@@ -11,6 +11,12 @@
         <a class="nav-link" href="/listings/new">Create Listing</a>
       </div>
       <div class="navbar-nav ms-auto">
+        <form class="d-flex nav-search-form" action="/listings" method="get" role="search">
+          <input class="form-control search-input" name="q" type="search" value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>" placeholder="Search destinations" aria-label="Search destinations"/>
+          <button class="btn btn-search" type="submit" aria-label="Search listings"><i class="fa-solid fa-magnifying-glass"></i><span>Search</span></button>
+        </form>
+      </div>
+      <div class="navbar-nav ms-auto">
         <% if (!currentUser) { %>
           <a class="nav-link" href="/register">Sign Up</a>
           <a class="nav-link" href="/login">Login</a>

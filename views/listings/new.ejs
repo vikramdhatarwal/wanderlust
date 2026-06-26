@@ -49,8 +49,27 @@
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label for="location" class="form-label">Location</label>
-                        <input type="text" id="location" name="listing[location]" placeholder="Enter location" class="form-control" required>
+                        <label for="category" class="form-label">Category</label>
+                        <select id="category" name="listing[category]" class="form-control" required>
+                            <option value="" selected disabled>Choose a category</option>
+                            <option value="Trending">Trending</option>
+                            <option value="Rooms">Rooms</option>
+                            <option value="Mountains">Mountains</option>
+                            <option value="Castles">Castles</option>
+                            <option value="Pools">Pools</option>
+                            <option value="Nature">Nature</option>
+                            <option value="Farms">Farms</option>
+                            <option value="Igloos">Igloos</option>
+                            <option value="Arctic">Arctic</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <div class="invalid-feedback">
+                            Please choose a category for your listing.
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="location" class="form-label">Location / Address</label>
+                        <input type="text" id="location" name="listing[location]" placeholder="Enter full address or nearest landmark" class="form-control" required>
                         <div class="invalid-feedback">
                             Please provide a location for your listing.
                         </div>

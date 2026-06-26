@@ -45,7 +45,18 @@
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label for="location" class="form-label">Location</label>
+                        <label for="category" class="form-label">Category</label>
+                        <select id="category" name="listing[category]" class="form-control" required>
+                            <% ["Trending", "Rooms", "Mountains", "Castles", "Pools", "Nature", "Farms", "Igloos", "Arctic", "Other"].forEach(category => { %>
+                                <option value="<%= category %>" <%= listing.category === category ? "selected" : "" %>><%= category %></option>
+                            <% }); %>
+                        </select>
+                        <div class="invalid-feedback">
+                            Please choose a category for your listing.
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="location" class="form-label">Location / Address</label>
                         <input type="text" id="location" name="listing[location]" value="<%= listing.location %>" class="form-control" required>
                         <div class="invalid-feedback">
                             Please provide a location for your listing.
