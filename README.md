@@ -1,6 +1,6 @@
-# WonderLust
+# WanderLust
 
-WonderLust is a full-stack travel accommodation web app inspired by marketplace-style stay booking platforms. Users can explore listings, filter and search destinations, view detailed listing pages, create and manage their own listings, upload listing images, leave reviews, and use an interactive map to locate stays and route from their current location.
+WanderLust is a full-stack travel accommodation web app inspired by marketplace-style stay booking platforms. Users can explore listings, filter and search destinations, view detailed listing pages, create and manage their own listings, upload listing images, leave reviews, and use an interactive map to locate stays and route from their current location.
 
 Live app: https://wanderlust-zwvw.onrender.com
 
