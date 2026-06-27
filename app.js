@@ -7,7 +7,7 @@ const app=express();
 const mongoose=require("mongoose");
 const path=require("path");
 const ejs=require("ejs");
-const PORT=3000;
+const PORT=process.env.PORT || 3000;
 const ejsMate=require("ejs-mate");
 const session=require("express-session");
 const { MongoStore } = require('connect-mongo');
@@ -20,6 +20,13 @@ const methodOverride=require("method-override");
 const passport=require("passport");
 const LocalStrategy=require("passport-local");
 const User=require("./models/user.js");
+
+const requiredEnv = ["ATLASDB_URL", "SECRET"];
+const missingEnv = requiredEnv.filter((key) => !process.env[key]);
+
+if (missingEnv.length) {
+    throw new Error(`Missing required environment variables: ${missingEnv.join(", ")}`);
+}
 
 
 // App-level middleware and view engine setup.
