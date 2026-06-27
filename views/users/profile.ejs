@@ -1,0 +1,92 @@
+<% layout('layouts/boilerplate') -%>
+<%
+    const profileName = user && user.username ? user.username : "Traveler";
+    const profileEmail = user && user.email ? user.email : "Email not available";
+%>
+
+<section class="profile-shell">
+    <div class="profile-hero">
+        <div class="profile-avatar" aria-hidden="true">
+            <%= profileName[0].toUpperCase() %>
+        </div>
+        <div class="profile-identity">
+            <p class="profile-kicker">Your profile</p>
+            <h1><%= profileName %></h1>
+            <p><i class="fa-regular fa-envelope"></i> <%= profileEmail %></p>
+        </div>
+        <a href="/listings/new" class="btn btn-dark add-btn profile-create-btn">
+            <i class="fa-solid fa-plus"></i>
+            Create listing
+        </a>
+    </div>
+
+    <div class="profile-stats">
+        <div class="profile-stat">
+            <i class="fa-solid fa-house"></i>
+            <span><%= userListings.length %></span>
+            <p>Listing<%= userListings.length === 1 ? "" : "s" %></p>
+        </div>
+        <div class="profile-stat">
+            <i class="fa-solid fa-star"></i>
+            <span><%= reviewCount %></span>
+            <p>Review<%= reviewCount === 1 ? "" : "s" %></p>
+        </div>
+        <div class="profile-stat">
+            <i class="fa-regular fa-id-card"></i>
+            <span>Active</span>
+            <p>Account status</p>
+        </div>
+    </div>
+
+    <div class="profile-section-head">
+        <div>
+            <p class="profile-kicker">Hosting</p>
+            <h2>Your listings</h2>
+        </div>
+    </div>
+
+    <% if (userListings.length === 0) { %>
+        <div class="profile-empty">
+            <i class="fa-regular fa-folder-open"></i>
+            <h3>No listings yet</h3>
+            <p>Start hosting by creating your first stay.</p>
+            <a href="/listings/new" class="btn btn-dark add-btn">Create listing</a>
+        </div>
+    <% } else { %>
+        <div class="profile-listings-grid">
+            <% userListings.forEach(listing => { %>
+                <article class="profile-listing-card">
+                    <% if (listing.image && listing.image.url) { %>
+                        <img src="<%= listing.image.url %>" alt="<%= listing.title %>">
+                    <% } else { %>
+                        <div class="profile-listing-placeholder" aria-hidden="true">
+                            <i class="fa-regular fa-image"></i>
+                        </div>
+                    <% } %>
+                    <div class="profile-listing-body">
+                        <span class="profile-listing-category"><%= listing.category || "Other" %></span>
+                        <h3><%= listing.title || "Untitled listing" %></h3>
+                        <p><i class="fa-solid fa-location-dot"></i> <%= [listing.location, listing.country].filter(Boolean).join(", ") || "Location unavailable" %></p>
+                        <strong>
+                            <% if (listing.price != null) { %>
+                                &#8377;<%= listing.price.toLocaleString('en-IN') %> /night
+                            <% } else { %>
+                                Price unavailable
+                            <% } %>
+                        </strong>
+                        <div class="profile-listing-actions">
+                            <a href="/listings/<%= listing._id %>" class="btn btn-outline-dark">
+                                <i class="fa-regular fa-eye"></i>
+                                View
+                            </a>
+                            <a href="/listings/<%= listing._id %>/edit" class="btn btn-dark add-btn">
+                                <i class="fa-regular fa-pen-to-square"></i>
+                                Edit
+                            </a>
+                        </div>
+                    </div>
+                </article>
+            <% }); %>
+        </div>
+    <% } %>
+</section>
