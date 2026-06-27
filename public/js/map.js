@@ -26,12 +26,38 @@
             && coordinates.every((coordinate) => Number.isFinite(coordinate));
     };
 
+    const sameCoordinates = (firstCoordinates, secondCoordinates) => {
+        return hasValidCoordinates(firstCoordinates)
+            && hasValidCoordinates(secondCoordinates)
+            && firstCoordinates[0] === secondCoordinates[0]
+            && firstCoordinates[1] === secondCoordinates[1];
+    };
+
     const showMapFallback = (message) => {
         if (!mapFallback) {
             return;
         }
 
         mapFallback.textContent = message;
+        mapFallback.classList.remove("d-none");
+    };
+
+    const showDirectionsFallback = () => {
+        if (!mapFallback || !destinationCoordinates) {
+            return;
+        }
+
+        const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${destinationCoordinates[1]},${destinationCoordinates[0]}`;
+        const message = document.createElement("span");
+        const directionsLink = document.createElement("a");
+
+        message.textContent = "Could not draw a route here. ";
+        directionsLink.href = directionsUrl;
+        directionsLink.target = "_blank";
+        directionsLink.rel = "noopener noreferrer";
+        directionsLink.textContent = "Open directions in Google Maps.";
+
+        mapFallback.replaceChildren(message, directionsLink);
         mapFallback.classList.remove("d-none");
     };
 
@@ -77,23 +103,31 @@
         });
     });
 
-    // OSRM sometimes starts the route a little away from the raw browser location.
-    // Adding the exact start point makes the visible line feel connected to the user marker.
-    const buildRouteFromCurrentLocation = (startCoordinates, routeCoordinates) => {
+    // OSRM snaps routes to roads. Keep the visible line connected to both markers.
+    const buildRouteBetweenMarkers = (startCoordinates, endCoordinates, routeCoordinates) => {
         const routeStart = routeCoordinates[0];
+        const routeEnd = routeCoordinates[routeCoordinates.length - 1];
+        let connectedRoute = routeCoordinates;
 
-        if (!routeStart || (routeStart[0] === startCoordinates[0] && routeStart[1] === startCoordinates[1])) {
-            return routeCoordinates;
+        if (!sameCoordinates(routeStart, startCoordinates)) {
+            connectedRoute = [startCoordinates, ...connectedRoute];
         }
 
-        return [startCoordinates, ...routeCoordinates];
+        if (!sameCoordinates(routeEnd, endCoordinates)) {
+            connectedRoute = [...connectedRoute, endCoordinates];
+        }
+
+        return connectedRoute;
     };
 
     const addDestinationMarker = (coordinates) => {
         destinationCoordinates = coordinates;
         enableRouteButtonIfReady();
         setRouteStatus("Press Go to route from your location");
-        map.flyTo({ center: coordinates, zoom: 14 });
+
+        if (map && isMapReady) {
+            map.flyTo({ center: coordinates, zoom: 14 });
+        }
 
         const popupContent = document.createElement("div");
         const popupTitle = document.createElement("strong");
@@ -204,11 +238,15 @@
             const routeData = await routeResponse.json();
             const route = routeData.routes && routeData.routes[0];
 
-            if (!route || !route.geometry || !route.geometry.coordinates) {
+            if (routeData.code !== "Ok" || !route || !route.geometry || !Array.isArray(route.geometry.coordinates)) {
                 throw new Error("No route found.");
             }
 
-            const routeCoordinates = buildRouteFromCurrentLocation(startCoordinates, route.geometry.coordinates);
+            if (!route.geometry.coordinates.every(hasValidCoordinates)) {
+                throw new Error("Route has invalid coordinates.");
+            }
+
+            const routeCoordinates = buildRouteBetweenMarkers(startCoordinates, destinationCoordinates, route.geometry.coordinates);
             drawRoute(startCoordinates, routeCoordinates);
             hideMapFallback();
 
@@ -221,12 +259,14 @@
                 setRouteStatus("Route ready");
             }
         } catch (error) {
-            const permissionDenied = error && error.code === error.PERMISSION_DENIED;
+            const permissionDenied = error && (error.code === 1 || error.code === error.PERMISSION_DENIED);
             setRouteStatus(permissionDenied ? "Location permission was blocked." : "Route unavailable right now.");
-            showMapFallback(permissionDenied
-                ? "Please allow location access in your browser and press Go again."
-                : "Could not draw a route from your current location. Please try again in a moment."
-            );
+
+            if (permissionDenied) {
+                showMapFallback("Please allow location access in your browser and press Go again.");
+            } else {
+                showDirectionsFallback();
+            }
         } finally {
             enableRouteButtonIfReady();
         }
@@ -262,7 +302,15 @@
     map.on("load", () => {
         isMapReady = true;
         enableRouteButtonIfReady();
+
+        if (destinationCoordinates) {
+            map.flyTo({ center: destinationCoordinates, zoom: 14 });
+        }
     });
+
+    if (goToListingBtn) {
+        goToListingBtn.addEventListener("click", handleGoToListing);
+    }
 
     if (hasValidCoordinates(mapData.listingCoordinates)) {
         addDestinationMarker(mapData.listingCoordinates);
@@ -286,7 +334,7 @@
         .then((data) => {
             const coordinates = data.features && data.features[0] && data.features[0].center;
 
-            if (!coordinates) {
+            if (!hasValidCoordinates(coordinates)) {
                 showMapFallback(`Could not find a map location for ${mapData.listingAddress}.`);
                 setRouteStatus("Destination unavailable");
                 return;
@@ -298,8 +346,4 @@
             showMapFallback("Could not load the map location for this listing.");
             setRouteStatus("Destination unavailable");
         });
-
-    if (goToListingBtn) {
-        goToListingBtn.addEventListener("click", handleGoToListing);
-    }
 })();
