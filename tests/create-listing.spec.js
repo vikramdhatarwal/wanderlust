@@ -1,15 +1,13 @@
 import { test, expect } from '@playwright/test';
+import { login } from './utils/login';
 
 test('User can create a listing', async ({ page }) => {
   const title = `demo-${Date.now()}`;
 
-  await page.goto('https://wanderlust-zwvw.onrender.com/');
+
 
   // Login
-  await page.getByRole('link', { name: 'Login' }).click();
-  await page.getByRole('textbox', { name: 'Username:' }).fill('demo');
-  await page.getByRole('textbox', { name: 'Password:' }).fill('1234');
-  await page.getByRole('button', { name: 'Login' }).click();
+  await login(page);
 
   // Verify login
   await expect(page.getByRole('link', { name: 'Logout' })).toBeVisible();
