@@ -27,7 +27,7 @@ export default defineConfig({
   reporter: 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
-    baseURL: 'https://wanderlust-zwvw.onrender.com',
+    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'https://wanderlust-zwvw.onrender.com',
     trace: 'on-first-retry',
   },
 

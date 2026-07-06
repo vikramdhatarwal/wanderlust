@@ -191,6 +191,8 @@ Run Chromium only:
 npx.cmd playwright test --project=chromium
 ```
 
+GitHub Actions runs the Playwright suite against a local app instance backed by a disposable MongoDB service, so CI no longer depends on the Render deployment.
+
 The suite covers auth, signup, protected redirects, profile, listing CRUD, search/filtering, tax toggle, reviews, validation, navigation, and 404 handling. Tests run with one worker because they share the deployed database and test account.
 
 ## Deployment

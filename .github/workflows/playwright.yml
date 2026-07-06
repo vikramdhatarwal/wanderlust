@@ -8,6 +8,11 @@ jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    services:
+      mongo:
+        image: mongo:7
+        ports:
+          - 27017:27017
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
@@ -15,9 +20,32 @@ jobs:
         node-version: lts/*
     - name: Install dependencies
       run: npm ci
+    - name: Seed test database
+      env:
+        NODE_ENV: test
+        ATLASDB_URL: mongodb://127.0.0.1:27017/wanderlust-test
+      run: node init/index.js
+    - name: Start app
+      env:
+        NODE_ENV: test
+        ATLASDB_URL: mongodb://127.0.0.1:27017/wanderlust-test
+        SECRET: playwright-secret
+        PORT: 3000
+      run: |
+        node app.js > app.log 2>&1 &
+        for i in {1..30}; do
+          if curl --fail http://127.0.0.1:3000 >/dev/null 2>&1; then
+            exit 0
+          fi
+          sleep 2
+        done
+        cat app.log
+        exit 1
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
     - name: Run Playwright tests
+      env:
+        PLAYWRIGHT_BASE_URL: http://127.0.0.1:3000
       run: npx playwright test
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}

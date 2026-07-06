@@ -90,8 +90,12 @@ module.exports.createListing=async(req,res)=>{
 
     // Keep uploaded Cloudinary metadata together on the listing document.
     if (req.file) {
+        const imageUrl = req.file.path && req.file.path.startsWith("http")
+            ? req.file.path
+            : `/uploads/${req.file.filename}`;
+
         newListing.image = {
-            url: req.file.path,
+            url: imageUrl,
             filename: req.file.filename
         };
     }
@@ -155,8 +159,12 @@ module.exports.updateListing=async(req, res) => {
 
     // Only replace the image when a new file was selected in the edit form.
     if (req.file) {
+        const imageUrl = req.file.path && req.file.path.startsWith("http")
+            ? req.file.path
+            : `/uploads/${req.file.filename}`;
+
         updatedListing.image = {
-            url: req.file.path,
+            url: imageUrl,
             filename: req.file.filename
         };
     }
