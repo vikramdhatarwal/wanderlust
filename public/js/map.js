@@ -1,3 +1,4 @@
+// Listing-page map: shows the stay location and can draw a route from the visitor.
 (() => {
     const mapElement = document.getElementById("map");
 
@@ -90,6 +91,7 @@
         return markerElement;
     };
 
+    // Turn browser location access into a promise so it works with async/await.
     const getCurrentPosition = () => new Promise((resolve, reject) => {
         if (!navigator.geolocation) {
             reject(new Error("Geolocation is not supported by this browser."));
@@ -205,6 +207,7 @@
         });
     };
 
+    // Get the visitor location, ask OSRM for a driving route, then draw it on the map.
     const handleGoToListing = async () => {
         if (!goToListingBtn || !destinationCoordinates) {
             setRouteStatus("Destination is still loading.");

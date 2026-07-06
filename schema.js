@@ -1,3 +1,4 @@
+// Joi checks form data before it reaches the database.
 const Joi = require('joi');
 
 const listingCategories = ['Arctic', 'Pools', 'Farms', 'Rooms', 'Mountains', 'Igloos', 'Nature', 'Castles', 'Trending', 'Other'];

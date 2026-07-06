@@ -2,6 +2,7 @@ node_modules/
 .env
 .codex-server.err.log
 .codex-server.out.log
+INTERVIEW_PREP.md
 
 # Playwright
 /test-results/

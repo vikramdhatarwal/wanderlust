@@ -1,3 +1,4 @@
+// URLs for listing browse, create, read, update, and delete actions.
 const express=require('express');
 const router=express.Router();
 const wrapAsync=require("../utils/wrapAsync.js");
@@ -9,7 +10,7 @@ const multer  = require('multer');
 const { storage } = require('../cloudConfig');
 const upload = multer({ storage });
 
-// Collection routes
+// Collection routes: show all listings or create one new listing.
 router.route("/")
     .get(wrapAsync(listingController.index))
     .post(
@@ -20,14 +21,14 @@ router.route("/")
     );
     
 
-// New listing form
+// New listing form: only logged-in users can open it.
 router.get(
     "/new",
     isLoggedIn,
     wrapAsync(listingController.renderNewForm)
 );
 
-// Individual listing routes
+// One-listing routes: show it, update it, or delete it.
 router.route("/:id")
     .get(wrapAsync(listingController.showListing))
     .put(

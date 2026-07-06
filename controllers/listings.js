@@ -1,3 +1,4 @@
+// Listing controllers contain the work behind listing pages and actions.
 const Listing = require("../models/listing");
 const ExpressError = require("../utils/ExpressError.js");
 
@@ -9,6 +10,7 @@ const hasValidCoordinates = (coordinates) => {
         && coordinates.every((coordinate) => Number.isFinite(coordinate));
 };
 
+// Ask MapTiler to change a written location into map coordinates.
 const geocodeListingLocation = async (listing) => {
     const mapToken = getMapToken();
     const address = [listing.location, listing.country].filter(Boolean).join(", ");
@@ -39,6 +41,7 @@ const geocodeListingLocation = async (listing) => {
     }
 };
 
+// Show listings and optionally filter them by search text and category.
 module.exports.index=async(req,res)=>{
     const { q = "", category = "" } = req.query;
     const trimmedSearch = q.trim();
@@ -80,10 +83,12 @@ module.exports.index=async(req,res)=>{
 }
 
 
+// Show the form used to create a listing.
 module.exports.renderNewForm=async(req,res)=>{
     res.render("listings/new.ejs");
 }
 
+// Create a listing for the currently logged-in user.
 module.exports.createListing=async(req,res)=>{
     const newListing=new Listing(req.body.listing);
     newListing.owner = req.user._id;
@@ -116,6 +121,7 @@ module.exports.createListing=async(req,res)=>{
 }
 
 
+// Show one listing with its owner and review authors.
 module.exports.showListing=async(req,res)=>{
     const {id}=req.params;
     
@@ -135,6 +141,7 @@ module.exports.showListing=async(req,res)=>{
 }
 
 
+// Show the edit form with the current listing values.
 module.exports.renderEditForm=async(req,res)=>{
     const {id}=req.params;
     
@@ -148,6 +155,7 @@ module.exports.renderEditForm=async(req,res)=>{
     
 }
 
+// Update a listing after the owner and form data were checked by middleware.
 module.exports.updateListing=async(req, res) => {
     const { id } = req.params;
     
@@ -186,6 +194,7 @@ module.exports.updateListing=async(req, res) => {
 }
 
 
+// Ask the owner to confirm before permanently deleting a listing.
 module.exports.renderDeleteForm=async(req,res)=>{
     const {id}=req.params;
 
@@ -197,6 +206,7 @@ module.exports.renderDeleteForm=async(req,res)=>{
 
 }
 
+// Delete the listing; the model hook also removes its linked reviews.
 module.exports.deleteListing=async(req,res)=>{
     const {id}=req.params;
     

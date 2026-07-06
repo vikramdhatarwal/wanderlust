@@ -1,3 +1,4 @@
+<%# Separate confirmation page reduces accidental listing deletion. %>
 <% layout('layouts/boilerplate') -%>
 <section class="listing-delete-shell">
     <div class="row justify-content-center">
@@ -19,6 +20,7 @@
                 </div>
 
                 <div class="listing-delete-actions">
+                    <%# method-override changes this POST form into a DELETE request. %>
                     <form action="/listings/<%= listing._id %>?_method=DELETE" method="POST" class="listing-delete-form">
                         <button type="submit" class="btn btn-dark add-btn listing-submit-btn listing-delete-confirm-btn">Delete Listing</button>
                     </form>

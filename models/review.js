@@ -1,3 +1,4 @@
+// Review model: a rating and comment written by one user for a listing.
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 

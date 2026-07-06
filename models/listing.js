@@ -1,3 +1,4 @@
+// Listing model: one stay, its image, location, owner, and review IDs.
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const Review = require('./review.js');
@@ -43,6 +44,7 @@ const listingSchema = new Schema({
         type: String,
         required: true
     },
+    // Coordinates are saved as [longitude, latitude] for map use.
     geometry: {
         type: {
             type: String,
@@ -54,10 +56,12 @@ const listingSchema = new Schema({
             default: undefined
         }
     },
+    // These IDs point to separate Review documents.
     reviews: [{
         type: Schema.Types.ObjectId,
         ref: 'Review'
     }],
+    // This ID points to the User who created the listing.
     owner: {
         type: Schema.Types.ObjectId,
         ref: 'User',

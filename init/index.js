@@ -1,3 +1,4 @@
+// Seed script: clears local data and adds sample listings plus test users.
 const mongoose = require('mongoose');
 const initData=require('./data.js');
 const listing = require('../models/listing.js');
@@ -14,6 +15,7 @@ async function seedDatabase(){
             User.deleteMany({})
         ]);
 
+        // Every sample listing needs an owner because Listing.owner is required.
         const seedOwner = await User.register(
             new User({ username: "seedowner", email: "seedowner@example.com" }),
             "SeedOwner123!"
@@ -35,6 +37,7 @@ async function seedDatabase(){
     }
 }
 
+// Run the seed only when this file is called directly: `node init/index.js`.
 if (require.main === module) {
     seedDatabase().then(() => {
         console.log("Database initialization complete.");

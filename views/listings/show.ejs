@@ -1,3 +1,4 @@
+<%# Details page: receives one listing, its owner, populated reviews, and mapToken. %>
 <% layout('layouts/boilerplate') -%>
 
 <section class="listing-show-shell">
@@ -36,6 +37,7 @@
                         </span>
                     </div>
 
+                    <%# The UI shows controls only to the owner; backend middleware checks this too. %>
                     <% const isListingOwner = currentUser && listing.owner && currentUser._id.equals(listing.owner._id || listing.owner); %>
 
                     <div class="listing-show-description">
@@ -54,6 +56,7 @@
                     
                     <div class="listing-show-divider"></div>
 
+                    <%# Only logged-in users can submit a review. %>
                     <div class="listing-reviews-section">
                         <% if (currentUser) { %>
                             <div class="listing-review-form-card">
@@ -101,6 +104,7 @@
                             </div>
                         <% } else { %>
                             <div class="listing-review-grid">
+                                <%# Build each review card and show its delete button only to its author. %>
                                 <% listing.reviews.forEach(review => { %>
                                     <% 
                                         const author = review.author;

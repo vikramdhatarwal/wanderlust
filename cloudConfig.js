@@ -1,3 +1,4 @@
+// Upload setup: uses Cloudinary in production and local disk storage during development.
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
 }
@@ -10,6 +11,7 @@ const path = require('path');
 
 const cloudinaryUrl = process.env.CLOUDINARY_URL;
 const hasPlaceholder = (value) => value && /<your_|your_api_key|your_api_secret|placeholder/i.test(value);
+// Check whether real Cloudinary details are available before choosing Cloudinary storage.
 const hasCloudinaryCredentials = Boolean(
   cloudinaryUrl || (
     process.env.CLOUD_NAME &&
@@ -18,6 +20,7 @@ const hasCloudinaryCredentials = Boolean(
   )
 );
 
+// Local fallback folder lets the app work even without Cloudinary details.
 const localUploadDirectory = path.join(__dirname, 'public', 'uploads');
 
 if (!fs.existsSync(localUploadDirectory)) {
@@ -43,6 +46,7 @@ const cloudinaryConfig = cloudinaryUrl ? {
     api_secret: process.env.CLOUDINARY_API_SECRET
 };
 
+// Multer receives the file; this decides where the received file is saved.
 const storage = hasCloudinaryCredentials
   ? new CloudinaryStorage({
       cloudinary: cloudinary,

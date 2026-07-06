@@ -1,4 +1,4 @@
-// Example starter JavaScript for disabling form submissions if there are invalid fields
+// Add Bootstrap validation styles and stop invalid forms before they are submitted.
 (() => {
   'use strict'
 

@@ -1,3 +1,4 @@
+// Sample listings used by the database seed script.
 const sampleListings = [
   {
     title: "Cozy Beachfront Cottage",

@@ -1,3 +1,4 @@
+<%# Shared page layout: every view is inserted where `body` appears below. %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -28,6 +29,7 @@
     <link href="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.css" rel="stylesheet" />
 </head>
 <body>
+    <%# Shared navigation and one-time success/error messages. %>
     <%- include('../includes/navbar.ejs') %>
     <div class="container">
         <%- include('../includes/flash.ejs') %>

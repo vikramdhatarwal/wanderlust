@@ -1,3 +1,4 @@
+// Main application file: sets up Express, the database, sessions, login, and routes.
 if (process.env.NODE_ENV !== "production") {
     require("dotenv").config();
 }
@@ -21,6 +22,7 @@ const passport=require("passport");
 const LocalStrategy=require("passport-local");
 const User=require("./models/user.js");
 
+// Stop early when the two values required to run the app are missing.
 const requiredEnv = ["ATLASDB_URL", "SECRET"];
 const missingEnv = requiredEnv.filter((key) => !process.env[key]);
 
@@ -29,7 +31,7 @@ if (missingEnv.length) {
 }
 
 
-// App-level middleware and view engine setup.
+// Basic Express setup: EJS pages, form data, method override, and public files.
 app.engine("ejs",ejsMate);
 app.use(express.urlencoded({extended:true}));
 app.use(methodOverride("_method"));
@@ -39,6 +41,7 @@ app.set("view engine","ejs");
 app.set("views",path.join(__dirname,"/views"));
 
 
+// Store login sessions in MongoDB so users stay logged in across requests.
 const store = new MongoStore({
     mongoUrl: process.env.ATLASDB_URL,
     crypto: {
@@ -48,6 +51,7 @@ const store = new MongoStore({
 });
 
 
+// Cookie settings keep a login active for seven days.
 const sessionOptions={
     store: store,
     secret: process.env.SECRET,
@@ -84,6 +88,7 @@ app.use((req,res,next)=>{
 
 
 
+// Public home page.
 app.get("/",(req,res)=>{
     res.render("home.ejs");
 });
@@ -111,7 +116,7 @@ async function main(){
 
 
 
-// Feature route groups.
+// Group related URLs into separate route files.
 app.use("/listings",listingRoutes);
 app.use("/listings/:id/reviews",reviewRoutes);
 app.use("/",userRoutes);

@@ -1,3 +1,4 @@
+<%# Edit form is filled with the current listing values and sends a PUT request. %>
 <% layout('layouts/boilerplate') -%>
 <section class="listing-form-shell">
     <div class="row justify-content-center">
@@ -44,6 +45,7 @@
                             </div>
                         </div>
                     </div>
+                    <%# A new image is optional; the old image stays when no file is selected. %>
                     <div class="mb-3">
                         <label for="category" class="form-label">Category</label>
                         <select id="category" name="listing[category]" class="form-control" required>

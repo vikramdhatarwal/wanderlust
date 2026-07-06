@@ -1,3 +1,4 @@
+<%# Browse page: receives allListings, searchQuery, and selectedCategory from the controller. %>
 <% layout('layouts/boilerplate') %>
 
 <%# Use the boilerplate layout for head/meta/styles/scripts. %>
@@ -35,6 +36,7 @@
         <% } %>
     </div>
 
+    <%# Category links keep the current search text while changing category. %>
     <div id="filters">
         <% filters.forEach(filter => { %>
             <% const isActiveFilter = selectedCategory && selectedCategory.toLowerCase() === filter.label.toLowerCase(); %>
@@ -56,6 +58,7 @@
         </div>
     </div>
 
+    <%# Show a helpful empty state instead of an empty grid. %>
     <% if (allListings.length === 0) { %>
         <div class="listing-empty-results">
             <i class="fa-regular fa-face-smile"></i>

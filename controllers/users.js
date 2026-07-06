@@ -1,8 +1,10 @@
+// User controllers handle signup, login, profile data, and logout.
 const User=require("../models/user.js");
 const Listing=require("../models/listing.js");
 const Review=require("../models/review.js");
 const ExpressError=require("../utils/ExpressError.js");
 
+// Read and clear the saved page so login sends the user back only once.
 const consumeRedirectUrl = (req, res) => {
     const redirectUrl = res.locals.redirectUrl || req.session.redirectUrl || "/listings";
     delete req.session.redirectUrl;
@@ -14,6 +16,7 @@ module.exports.renderSignUpForm = (req, res) => {
 }
 
 
+// Register a user, log them in immediately, then send them to the saved page.
 module.exports.signUp = async (req, res, next) => {
     try {
         const { email, username, password } = req.body;
@@ -34,6 +37,7 @@ module.exports.renderLoginForm = (req, res) => {
     res.render("users/login.ejs");
 }
 
+// Build the profile page with the user's listings and number of reviews.
 module.exports.renderProfile = async(req, res) => {
     const profileUser = await User.findById(req.user._id);
 

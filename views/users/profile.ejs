@@ -1,3 +1,4 @@
+<%# Profile page shows the logged-in user's details and owned listings. %>
 <% layout('layouts/boilerplate') -%>
 <%
     const profileName = user && user.username ? user.username : "Traveler";
@@ -20,6 +21,7 @@
         </a>
     </div>
 
+    <%# Summary numbers are prepared by the profile controller. %>
     <div class="profile-stats">
         <div class="profile-stat">
             <i class="fa-solid fa-house"></i>
@@ -45,6 +47,7 @@
         </div>
     </div>
 
+    <%# Use an empty state when this user has not hosted any listings yet. %>
     <% if (userListings.length === 0) { %>
         <div class="profile-empty">
             <i class="fa-regular fa-folder-open"></i>

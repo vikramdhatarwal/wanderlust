@@ -1,3 +1,4 @@
+// Nested review URLs live under /listings/:id/reviews.
 const express = require("express");
 const router = express.Router({ mergeParams: true });
 const wrapAsync=require("../utils/wrapAsync.js");
@@ -7,6 +8,7 @@ const Listing=require("../models/listing");
 const Review=require("../models/review");
 const { isLoggedIn, isReviewAuthor } = require("../middleware.js");
 
+// Check rating and comment before a review is saved.
 const validateReview=(req,res,next)=>{
     const { error } = reviewSchema.validate(req.body);
     if (error) {

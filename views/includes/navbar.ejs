@@ -1,3 +1,4 @@
+<%# Main navigation. The right side changes based on whether currentUser exists. %>
 <nav class="navbar navbar-light sticky-top navbar-expand-md bg-body-light" style="border-bottom: 2px solid #dee2e6;">
   <div class="container-fluid">
     <a class="navbar-brand" href="/"><i class="fa-regular fa-compass"></i> </a>
@@ -17,6 +18,7 @@
         </form>
       </div>
       <div class="navbar-nav ms-auto">
+        <%# Guests see signup/login; logged-in users see profile/logout. %>
         <% if (!currentUser) { %>
           <a class="nav-link" href="/register">Sign Up</a>
           <a class="nav-link" href="/login">Login</a>

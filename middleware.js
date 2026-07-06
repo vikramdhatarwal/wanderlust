@@ -1,8 +1,10 @@
+// Reusable checks that run before a controller is allowed to do its work.
 const Listing=require("./models/listing");
 const Review=require("./models/review");
 const { listingSchema } = require("./schema.js");
 const ExpressError=require("./utils/ExpressError.js");
 
+// Only allow redirects inside this app after login; never redirect to another website.
 const isSafeLocalRedirect = (redirectUrl) => {
     return typeof redirectUrl === "string"
         && redirectUrl.startsWith("/")
@@ -48,6 +50,7 @@ module.exports.isLoggedIn=(req,res,next)=>{
 };
 
 
+// Make the saved page available after Passport has completed login.
 module.exports.saveRedirectUrl=async(req,res,next)=>{
     if(req.session.redirectUrl){
         res.locals.redirectUrl=req.session.redirectUrl;
@@ -56,6 +59,7 @@ module.exports.saveRedirectUrl=async(req,res,next)=>{
 };
 
 
+// Allow listing changes only when the logged-in user owns that listing.
 module.exports.isowner=async(req,res,next)=>{
     const {id}=req.params;
     const listing=await Listing.findById(id);
@@ -70,6 +74,7 @@ module.exports.isowner=async(req,res,next)=>{
     next();
 };
 
+// Allow review deletion only when the logged-in user wrote that review.
 module.exports.isReviewAuthor=async(req,res,next)=>{
     const {id,reviewId}=req.params;
     const review=await Review.findById(reviewId);
