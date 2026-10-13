@@ -1,0 +1,7 @@
+node_modules
+npm-debug.log
+.env
+.git
+.env.test
+test-results
+playwright-report

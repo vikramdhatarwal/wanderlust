@@ -98,9 +98,10 @@ const MONGO_URL=process.env.ATLASDB_URL;
 
 
 // Start the server only after MongoDB is reachable.
+// Start the server only after MongoDB is reachable.
 main().then(()=>{
     console.log("Connected to MongoDB");
-    app.listen(PORT,()=>{
+    app.listen(PORT, '0.0.0.0', ()=>{
         console.log(`server is running on port ${PORT}`);
     });
 }).catch((err)=>{
