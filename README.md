@@ -1,14 +1,13 @@
 # WanderLust
 
-A full-stack travel accommodation platform inspired by Airbnb, built with **Node.js, Express, MongoDB, Passport.js, Cloudinary, and MapTiler**.
+A full-stack travel accommodation platform inspired by Airbnb, built with **Node.js, Express, MongoDB, Passport.js, and MapTiler**, with optional Cloudinary image storage, containerized with **Docker**, and deployed on **AWS (ECS Fargate)**.
 
-**Live Demo:** https://wanderlust-zwvw.onrender.com
+**Live Demo (AWS):** https://wanderlust.vikramdhatarwal.dev
+**Backup Demo (Render):** https://wanderlust-zwvw.onrender.com
 
-**Automated Testing:** 57 Playwright End-to-End Tests Passing
+**Automated Testing:** 19 Playwright scenarios run across Chromium, Firefox, and WebKit (57 browser test runs).
 
-WanderLust is a full-stack travel accommodation app inspired by stay marketplace platforms. Users can browse, search, and filter stays, create and manage listings, upload images, leave reviews, and view listing locations on a map.
-
-
+WanderLust lets users browse, search, and filter stays, create and manage listings, upload images, leave reviews, and view listing locations on a map.
 
 ## Features
 
@@ -18,18 +17,38 @@ WanderLust is a full-stack travel accommodation app inspired by stay marketplace
 - Profile page with account info, owned listings, listing count, and review count.
 - Create, edit, and delete listings with owner-only authorization.
 - Add and delete reviews with author-only authorization.
-- Cloudinary image uploads.
+- Image uploads through Cloudinary or local disk storage.
 - MapTiler maps, geocoding, and route support from visitor location.
 - Joi validation and friendly error pages.
 - Playwright end-to-end tests.
 
 ## Tech Stack
 
-- **Backend:** Node.js, Express 5, MongoDB, Mongoose, Passport, express-session, connect-mongo, Joi
+- **Backend:** Node.js, Express 5, MongoDB, Mongoose, Passport, passport-local-mongoose, express-session, connect-mongo, Joi
 - **Frontend:** EJS, ejs-mate, Bootstrap, Font Awesome, custom CSS/JS
-- **Uploads/Maps:** Cloudinary, Multer, multer-storage-cloudinary, MapTiler, OSRM
-- **Testing:** Playwright
-- **Deployment:** Render, MongoDB Atlas
+- **Uploads/Maps:** Multer with optional Cloudinary storage, MapTiler, OSRM
+- **Testing:** Playwright, GitHub Actions
+- **DevOps/Deployment:** Docker, AWS (ECR, ECS Fargate, Application Load Balancer, ACM), Render (backup), MongoDB Atlas
+
+## Architecture (AWS)
+
+```text
+Browser
+  -> DNS (CNAME: wanderlust.vikramdhatarwal.dev)
+  -> Application Load Balancer
+       HTTP :80  -> redirect (301) to HTTPS
+       HTTPS :443 (ACM certificate) -> target group
+  -> Amazon ECS service on AWS Fargate (Docker image from Amazon ECR)
+  -> MongoDB Atlas / Cloudinary / MapTiler
+```
+
+- The Docker image is built locally and pushed to Amazon ECR (`ap-southeast-2`).
+- The container runs as an Amazon ECS service on AWS Fargate, behind an Application Load Balancer.
+- HTTPS is terminated at the load balancer with a free AWS Certificate Manager certificate.
+- HTTP requests are redirected to HTTPS.
+- The custom domain points to the load balancer through a DNS CNAME record.
+- Configuration is passed to the container as environment variables at runtime and is not committed to the repository.
+- The AWS deployment runs on a time-limited free plan, so the Render deployment is kept as a backup.
 
 ## Project Structure
 
@@ -39,6 +58,7 @@ WanderLust is a full-stack travel accommodation app inspired by stay marketplace
 |-- cloudConfig.js
 |-- middleware.js
 |-- schema.js
+|-- Dockerfile
 |-- controllers/
 |-- models/
 |-- public/
@@ -55,8 +75,9 @@ Requirements:
 - Node.js `20.18.0`
 - npm
 - MongoDB connection string
-- Cloudinary account
-- MapTiler token
+- Cloudinary account (optional; without credentials, uploads use local disk storage)
+- MapTiler token (optional; maps and geocoding need a valid token)
+- Docker (optional, for the container run)
 
 Install dependencies:
 
@@ -92,20 +113,27 @@ Local URL:
 http://localhost:3000
 ```
 
+## Run with Docker
+
+```bash
+docker build -t wanderlust .
+docker run -p 3000:3000 --env-file .env wanderlust
+```
+
 ## Environment Variables
 
 | Variable | Required | Purpose |
 | --- | --- | --- |
 | `ATLASDB_URL` | Yes | MongoDB and session store connection. |
 | `SECRET` | Yes | Session and store encryption secret. |
-| `CLOUD_NAME` | Yes, unless using `CLOUDINARY_URL` | Cloudinary cloud name. |
-| `CLOUDINARY_API_KEY` | Yes, unless using `CLOUDINARY_URL` | Cloudinary API key. |
-| `CLOUDINARY_API_SECRET` | Yes, unless using `CLOUDINARY_URL` | Cloudinary API secret. |
+| `CLOUD_NAME` | Optional | Cloudinary cloud name; use with the API key and secret to enable Cloudinary uploads. |
+| `CLOUDINARY_API_KEY` | Optional | Cloudinary API key. |
+| `CLOUDINARY_API_SECRET` | Optional | Cloudinary API secret. |
 | `CLOUDINARY_URL` | Optional | Single Cloudinary config variable. |
 | `MAP_TOKEN` | Recommended | MapTiler maps and geocoding token. |
 | `MAP_API_KEY` | Optional | Alternate supported MapTiler env name. |
 | `PORT` | Optional | Defaults to `3000`. |
-| `NODE_ENV` | Optional | Use `production` on Render. |
+| `NODE_ENV` | Optional | Use `production` when deployed. |
 
 ## Scripts
 
@@ -154,7 +182,7 @@ Reviews include rating, comment, author, and timestamp. Ratings must be from `1`
 
 ## Uploads and Maps
 
-Images are uploaded to Cloudinary folder:
+When Cloudinary is configured, images are uploaded to this folder:
 
 ```text
 wanderlust_DEV
@@ -166,7 +194,7 @@ Listing pages use MapTiler for maps/geocoding and OSRM for route drawing. Browse
 
 ## Testing
 
-Create `.env.test`:
+Set these environment variables for tests that log in to the configured test database. Playwright does not load `.env.test` automatically, so provide them in your shell or CI environment:
 
 ```env
 TEST_USERNAME=demo
@@ -191,13 +219,22 @@ Run Chromium only:
 npx.cmd playwright test --project=chromium
 ```
 
-GitHub Actions runs the Playwright suite against a local app instance backed by a disposable MongoDB service, so CI no longer depends on the Render deployment.
+GitHub Actions runs the Playwright suite against a local app instance backed by a disposable MongoDB service, so CI does not depend on a live deployment.
 
 The suite covers auth, signup, protected redirects, profile, listing CRUD, search/filtering, tax toggle, reviews, validation, navigation, and 404 handling. Tests run with one worker because they share the deployed database and test account.
 
 ## Deployment
 
-Recommended Render settings:
+### AWS (Docker, ECS Fargate)
+
+1. Build the image: `docker build -t wanderlust .`
+2. Push it to Amazon ECR (use "View push commands" in the ECR console).
+3. Run the image as an Amazon ECS service on AWS Fargate behind an Application Load Balancer, with a target group on the app port.
+4. Attach an ACM certificate to an HTTPS:443 listener and redirect HTTP:80 to HTTPS.
+5. Point your domain's CNAME record at the load balancer.
+6. Provide the environment variables below to the task definition.
+
+### Render (backup)
 
 ```text
 Build Command: npm install
@@ -218,7 +255,7 @@ NODE_ENV=production
 
 ## Notes
 
-- There is no `start` script yet; use `node app.js`.
+- The AWS deployment runs on a time-limited free plan; the Render deployment stays up as a backup.
 - Render free instances may be slow on first load.
 - OSRM is public, so routing speed and availability may vary.
 - Tests that create users or listings write to the configured target database.
